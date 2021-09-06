@@ -1,15 +1,16 @@
 ﻿using MagicBots.Overseer.DankDitties;
+using MagicBots.Overseer.Framework;
 using MagicBots.Overseer.Framework.Discord;
 using Microsoft.Extensions.Hosting;
 using Serilog;
-using System.Threading.Tasks;
 using SimpleInjector;
+using System.Threading.Tasks;
 
 namespace MagicBots.Overseer
 {
-    class Program
+    internal static class Program
     {
-        static async Task Main()
+        private static async Task Main()
         {
             var container = new Container();
 
@@ -33,10 +34,11 @@ namespace MagicBots.Overseer
                         options.AddLogging();
                     });
                 })
+                .UseOverseerModules(container)
                 .UseConsoleLifetime()
                 .Build()
                 .UseSimpleInjector(container);
-            
+
             // Verify
             container.Verify();
 

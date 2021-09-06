@@ -1,22 +1,37 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using MagicBots.Overseer.Framework.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace MagicBots.Overseer.Framework.Discord
 {
     public class OverseerHostedService : DiscordClientHostedService
     {
-        public OverseerHostedService(ILogger logger, IConfiguration configuration) : base(logger, configuration)
+        private readonly TriggeringService _triggeringService;
+
+        public OverseerHostedService(ILogger logger, IConfiguration configuration,
+            TriggeringService triggeringService) : base(logger, configuration)
         {
+            _triggeringService = triggeringService;
         }
 
         protected override string ConfigSectionName => "DiscordOverseer";
+
+        private async Task MessageReceivedAsync(SocketMessage rawMessage)
+        {
+            // Ignore system messages, or messages from other bots
+            // TODO: Consider making this part of a trigger configurable per trigger somehow
+            if (!(rawMessage is SocketUserMessage message))
+                return;
+            if (message.Source != MessageSource.User)
+                return;
+
+            // TODO: Investigate if this will cause deadlocks
+            var context = new DiscordTriggerContext(Client!, message);
+            await _triggeringService.ProcessMessage(context);
+        }
 
         protected override DiscordSocketConfig BuildSettings(IConfiguration configuration)
         {
@@ -31,7 +46,11 @@ namespace MagicBots.Overseer.Framework.Discord
 
         protected override Task ConfigureClientAsync(DiscordSocketClient client)
         {
-            // TODO: add handlers here
+            if (Client == null)
+                return Task.CompletedTask;
+
+            Client!.MessageReceived += MessageReceivedAsync;
+
             return Task.CompletedTask;
         }
     }
