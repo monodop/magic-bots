@@ -1,0 +1,14 @@
+* text=lf
+
+# VS/csharp
+*.asax text eol=crlf
+*.bat text eol=crlf
+*.cs text eol=crlf
+*.csproj text eol=crlf
+*.resx text eol=crlf
+*.sln text eol=crlf
+
+# Other
+*.py text eol=lf
+*.sh text eol=lf
+*.yml text eol=lf
