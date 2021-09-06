@@ -12,7 +12,7 @@ namespace MagicBots.Overseer.Framework.Discord
 {
     public class OverseerHostedService : DiscordClientHostedService
     {
-        public OverseerHostedService(ILogger<OverseerHostedService> logger, IConfiguration configuration) : base(logger, configuration)
+        public OverseerHostedService(ILogger logger, IConfiguration configuration) : base(logger, configuration)
         {
         }
 

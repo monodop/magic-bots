@@ -13,7 +13,7 @@ namespace MagicBots.Overseer.DankDitties
 {
     public class DankDittiesHostedService : DiscordClientHostedService
     {
-        public DankDittiesHostedService(ILogger<DankDittiesHostedService> logger, IConfiguration configuration) : base(logger, configuration)
+        public DankDittiesHostedService(ILogger logger, IConfiguration configuration) : base(logger, configuration)
         {
         }
 
