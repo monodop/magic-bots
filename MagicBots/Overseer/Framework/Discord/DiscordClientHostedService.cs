@@ -1,14 +1,9 @@
 ﻿using Discord;
-using Discord.Addons.Hosting;
 using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,7 +16,7 @@ namespace MagicBots.Overseer.Framework.Discord
         protected ILogger Logger { get; }
         protected IConfiguration Configuration { get; }
 
-        public DiscordClientHostedService(ILogger<DiscordClientHostedService> logger, IConfiguration configuration)
+        public DiscordClientHostedService(ILogger logger, IConfiguration configuration)
         {
             Logger = logger;
             Configuration = configuration;

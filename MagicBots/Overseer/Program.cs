@@ -1,13 +1,9 @@
-﻿using Discord;
-using Discord.Addons.Hosting;
-using Discord.WebSocket;
-using MagicBots.Overseer.DankDitties;
+﻿using MagicBots.Overseer.DankDitties;
 using MagicBots.Overseer.Framework.Discord;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
-using System.Net.Http;
 using System.Threading.Tasks;
+using SimpleInjector;
 
 namespace MagicBots.Overseer
 {
@@ -15,6 +11,8 @@ namespace MagicBots.Overseer
     {
         static async Task Main()
         {
+            var container = new Container();
+
             //Log is available everywhere, useful for places where it isn't practical to use ILogger injection
             Log.Logger = new LoggerConfiguration()
                 .Enrich.FromLogContext()
@@ -23,21 +21,26 @@ namespace MagicBots.Overseer
 
             //CreateDefaultBuilder configures a lot of stuff for us automatically.
             //See: https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/generic-host?view=aspnetcore-5.0#default-builder-settings
-            var hostBuilder = Host.CreateDefaultBuilder()
+            var host = Host.CreateDefaultBuilder()
                 .UseSerilog()
                 .ConfigureServices((context, services) =>
                 {
-                    // Hosted services
-                    services.AddHostedService<OverseerHostedService>();
-                    services.AddSingleton<OverseerHostedService>();
-                    services.AddHostedService<DankDittiesHostedService>();
-                    services.AddSingleton<DankDittiesHostedService>();
+                    services.AddSimpleInjector(container, options =>
+                    {
+                        options.AddHostedService<OverseerHostedService>();
+                        options.AddHostedService<DankDittiesHostedService>();
 
-                    // Core components
-                    services.AddSingleton<HttpClient>();
-                });
+                        options.AddLogging();
+                    });
+                })
+                .UseConsoleLifetime()
+                .Build()
+                .UseSimpleInjector(container);
+            
+            // Verify
+            container.Verify();
 
-            await hostBuilder.RunConsoleAsync();
+            await host.RunAsync();
         }
     }
 }
