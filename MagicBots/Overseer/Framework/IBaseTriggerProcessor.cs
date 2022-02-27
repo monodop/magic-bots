@@ -1,4 +1,4 @@
-﻿namespace MagicBots.Overseer.Framework.Triggers
+﻿namespace MagicBots.Overseer.Framework
 {
     public interface IBaseTriggerProcessor<in T> : IBaseTriggerProcessor where T : TriggerAttribute
     {

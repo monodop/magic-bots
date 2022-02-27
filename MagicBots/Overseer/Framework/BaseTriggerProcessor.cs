@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MagicBots.Overseer.Framework.Triggers
+namespace MagicBots.Overseer.Framework
 {
     /**
      * Base processor to help with dynamic processor calling.

@@ -1,4 +1,4 @@
-﻿namespace MagicBots.Overseer.Framework.Cooldowns
+﻿namespace MagicBots.Overseer.Framework
 {
     /**
      * Processor to help with dynamic processor calling.

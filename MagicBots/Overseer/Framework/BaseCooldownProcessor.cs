@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MagicBots.Overseer.Framework.Cooldowns
+namespace MagicBots.Overseer.Framework
 {
     /**
      * Base processor to help with dynamic processor calling.
