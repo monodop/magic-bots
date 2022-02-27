@@ -35,8 +35,8 @@ namespace MagicBots.Overseer.Framework.Services
             var isReady = cooldownProcessor.IsReady(cooldown, context, method);
 
             if (!isReady)
-                _logger.LogWarning(
-                    $"Cooldown '{cooldownProcessor.GetType().FullName}' prevented '{method.Type.FullName}.{method.Method.Name}' from processing");
+                _logger.LogInformation(
+                    $"Cooldown '{cooldownProcessor.GetType().FullName}' prevented '{method.Type.FullName}#{method.Method.Name}' from processing");
 
             return isReady;
         }

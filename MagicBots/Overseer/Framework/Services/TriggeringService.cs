@@ -80,6 +80,7 @@ namespace MagicBots.Overseer.Framework.Services
         {
             var service = _container.GetInstance(trigger.Type);
             var method = trigger.Method;
+            _logger.LogInformation($"Triggering '{method.ReflectedType!.FullName}#{method.Name}'");
             await Task.Factory.StartNew(() => method.Invoke(service, new object[] {context}));
         }
     }
