@@ -6,11 +6,11 @@ using Microsoft.Extensions.Logging;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MagicBots.Overseer.Modules
+namespace MagicBots.Overseer.Modules.What
 {
     public class WhatModule : OverseerModule
     {
-        public WhatModule(OverseerHostedService overseer,
+        public WhatModule(OverseerDiscordService overseer,
             ILogger<WhatModule> logger, IConfiguration config) : base(overseer.Client!,
             logger, config)
         {
