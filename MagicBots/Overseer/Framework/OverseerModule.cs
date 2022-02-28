@@ -1,6 +1,7 @@
 ﻿using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
 
 namespace MagicBots.Overseer.Framework
 {
@@ -17,14 +18,6 @@ namespace MagicBots.Overseer.Framework
             Discord = discord;
             Logger = logger;
             Config = config;
-        }
-
-        protected T? GetFromConfig<T>(string sectionName)
-        {
-            var foundValue = Config.GetSection(sectionName).Get<T>();
-            if (foundValue == null)
-                Logger.LogWarning($"Could not find config section '{sectionName}'");
-            return foundValue;
         }
     }
 }

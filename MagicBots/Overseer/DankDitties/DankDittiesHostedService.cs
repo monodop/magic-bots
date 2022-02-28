@@ -3,29 +3,21 @@ using Discord.WebSocket;
 using MagicBots.Overseer.Framework.Discord;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using SimpleInjector;
+using System;
 using System.Threading.Tasks;
 
 namespace MagicBots.Overseer.DankDitties
 {
     public class DankDittiesHostedService : DiscordClientHostedService
     {
-        public DankDittiesHostedService(ILogger logger, IConfiguration configuration) : base(logger, configuration)
+        public DankDittiesHostedService(ILogger logger, IConfiguration configuration, Container container) : base(logger, configuration, container)
         {
         }
 
+        protected override Type DiscordServiceType => typeof(DankDittiesDiscordService);
         protected override string ConfigSectionName => "DiscordDankDitties";
-
-        protected override DiscordSocketConfig BuildSettings(IConfiguration configuration)
-        {
-            var settings = base.BuildSettings(configuration);
-
-            settings.LogLevel = LogSeverity.Debug;
-            settings.AlwaysDownloadUsers = true;
-            settings.MessageCacheSize = 200;
-
-            return settings;
-        }
-
+        
         protected override Task ConfigureClientAsync(DiscordSocketClient client)
         {
             // TODO: add handlers here

@@ -428,3 +428,6 @@ fabric.properties
 
 # Ignore development secrets
 appsettings.Development.json
+
+# Ignore Data folder
+MagicBots/Overseer/Data/

@@ -1,6 +1,9 @@
 ﻿using MagicBots.Overseer.DankDitties;
 using MagicBots.Overseer.Framework;
-using MagicBots.Overseer.Framework.Discord;
+using MagicBots.Overseer.Framework.Services;
+using MagicBots.Overseer.Modules.Acromean;
+using MagicBots.Overseer.Overseer;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using SimpleInjector;
@@ -30,9 +33,14 @@ namespace MagicBots.Overseer
                     {
                         options.AddHostedService<OverseerHostedService>();
                         options.AddHostedService<DankDittiesHostedService>();
+                        
+                        // Register help services
+                        container.RegisterSingleton<FirestoreService>();
 
                         options.AddLogging();
                     });
+                    
+                    services.AddHttpClient();
                 })
                 .UseOverseerModules(container)
                 .UseConsoleLifetime()

@@ -3,6 +3,7 @@ using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using SimpleInjector;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,33 +12,27 @@ namespace MagicBots.Overseer.Framework.Discord
 {
     public abstract class DiscordClientHostedService : IHostedService
     {
-        private readonly string _token;
-        public readonly DiscordSocketClient? Client;
+        public readonly DiscordService DiscordService;
 
-        public DiscordClientHostedService(ILogger logger, IConfiguration configuration)
+        public DiscordClientHostedService(ILogger logger, IConfiguration configuration, Container container)
         {
             Logger = logger;
             Configuration = configuration;
-
-            // TODO: error handling
-            var c = configuration.GetSection(ConfigSectionName);
-            _token = c["token"];
-            var enabled = !c.GetValue<bool>("disabled");
-
-            if (!enabled)
-                return;
-
-            Client = new DiscordSocketClient(BuildSettings(c));
-            Client.Log += OnLog;
+            DiscordService = (DiscordService) container.GetInstance(DiscordServiceType);
         }
 
         protected ILogger Logger { get; }
         protected IConfiguration Configuration { get; }
         protected abstract string ConfigSectionName { get; }
+        protected abstract Type DiscordServiceType { get; }
 
         public virtual async Task StartAsync(CancellationToken cancellationToken)
         {
-            if (Client == null)
+            // TODO: error handling
+            var c = Configuration.GetSection(ConfigSectionName);
+            var enabled = !c.GetValue<bool>("disabled");
+
+            if (!enabled || DiscordService.Client == null)
                 return;
 
             Logger.LogInformation($"Discord.NET hosted service `{ConfigSectionName}` is starting");
@@ -45,9 +40,9 @@ namespace MagicBots.Overseer.Framework.Discord
             try
             {
                 // TODO: cancellation token
-                await ConfigureClientAsync(Client);
-                await Client.LoginAsync(TokenType.Bot, _token);
-                await Client.StartAsync();
+                await ConfigureClientAsync(DiscordService.Client);
+                await DiscordService.LoginAsync();
+                await DiscordService.StartAsync();
             }
             catch (OperationCanceledException)
             {
@@ -57,14 +52,11 @@ namespace MagicBots.Overseer.Framework.Discord
 
         public virtual async Task StopAsync(CancellationToken cancellationToken)
         {
-            if (Client == null)
-                return;
-
             Logger.LogInformation($"Discord.NET hosted service `{ConfigSectionName}` is stopping");
             try
             {
                 // TODO: cancellation token
-                await Client.StopAsync();
+                await DiscordService.StopAsync();
             }
             catch (OperationCanceledException)
             {
@@ -73,27 +65,6 @@ namespace MagicBots.Overseer.Framework.Discord
             }
         }
 
-        protected virtual Task OnLog(LogMessage arg)
-        {
-            var logLevel = arg.Severity switch
-            {
-                LogSeverity.Verbose => LogLevel.Trace,
-                LogSeverity.Debug => LogLevel.Debug,
-                LogSeverity.Info => LogLevel.Information,
-                LogSeverity.Warning => LogLevel.Warning,
-                LogSeverity.Error => LogLevel.Error,
-                LogSeverity.Critical => LogLevel.Critical,
-                _ => LogLevel.Information
-            };
-            Logger.Log(logLevel, $"{ConfigSectionName}: {arg.Source}: {arg.Message} {arg.Exception}");
-            return Task.FromResult(0);
-        }
-
         protected abstract Task ConfigureClientAsync(DiscordSocketClient client);
-
-        protected virtual DiscordSocketConfig BuildSettings(IConfiguration configuration)
-        {
-            return new DiscordSocketConfig();
-        }
     }
 }
