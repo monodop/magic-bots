@@ -1,6 +1,4 @@
-﻿using MagicBots.Overseer.Framework.Cooldowns;
-using MagicBots.Overseer.Framework.Triggers;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using SimpleInjector;
 using System.Collections.Generic;
 using System.Linq;
@@ -61,6 +59,7 @@ namespace MagicBots.Overseer.Framework.Services
          */
         public async Task ProcessMessage(DiscordTriggerContext context)
         {
+            var tasks = new List<Task>();
             foreach (var trigger in _triggers)
             {
                 if (!trigger.TriggerAttributes.Any(attribute =>
@@ -69,19 +68,21 @@ namespace MagicBots.Overseer.Framework.Services
                 if (!trigger.CooldownAttributes.All(
                     attribute => _cooldownProcessorService.IsReady(attribute, context, trigger)))
                     continue;
-                await InvokeTrigger(trigger, context);
+                tasks.Add(InvokeTrigger(trigger, context));
             }
+            await Task.WhenAll(tasks);
         }
 
         /**
          * Invokes the trigger using the context.
          */
-        private async Task InvokeTrigger(TriggerableMethod trigger, DiscordTriggerContext context)
+        private Task InvokeTrigger(TriggerableMethod trigger, DiscordTriggerContext context)
         {
             var service = _container.GetInstance(trigger.Type);
             var method = trigger.Method;
-            _logger.LogInformation($"Triggering '{method.ReflectedType!.FullName}#{method.Name}'");
-            await Task.Factory.StartNew(() => method.Invoke(service, new object[] {context}));
+            var fullName = $"{method.ReflectedType!.FullName}#{method.Name}";
+            _logger.LogInformation($"Triggering '{fullName}'");
+            return Task.Run(async () => await (Task)method.Invoke(service, new object[] {context})!);
         }
     }
 }
