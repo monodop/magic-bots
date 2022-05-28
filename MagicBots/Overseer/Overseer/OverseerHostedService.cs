@@ -15,13 +15,12 @@ namespace MagicBots.Overseer.Overseer
     {
         private readonly TriggeringService _triggeringService;
 
-        public OverseerHostedService(ILogger logger, IConfiguration configuration, Container container,
-            TriggeringService triggeringService) : base(logger, configuration, container)
+        public OverseerHostedService(ILogger logger, IConfiguration configuration, OverseerDiscordService discordService,
+            TriggeringService triggeringService) : base(logger, configuration, discordService)
         {
             _triggeringService = triggeringService;
         }
 
-        protected override Type DiscordServiceType => typeof(OverseerDiscordService);
         protected override string ConfigSectionName => "DiscordOverseer";
         
         protected override Task ConfigureClientAsync(DiscordSocketClient client)
