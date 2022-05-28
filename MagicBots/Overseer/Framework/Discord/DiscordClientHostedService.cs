@@ -14,17 +14,16 @@ namespace MagicBots.Overseer.Framework.Discord
     {
         public readonly DiscordService DiscordService;
 
-        public DiscordClientHostedService(ILogger logger, IConfiguration configuration, Container container)
+        public DiscordClientHostedService(ILogger logger, IConfiguration configuration, DiscordService discordService)
         {
             Logger = logger;
             Configuration = configuration;
-            DiscordService = (DiscordService) container.GetInstance(DiscordServiceType);
+            DiscordService = discordService;
         }
 
         protected ILogger Logger { get; }
         protected IConfiguration Configuration { get; }
         protected abstract string ConfigSectionName { get; }
-        protected abstract Type DiscordServiceType { get; }
 
         public virtual async Task StartAsync(CancellationToken cancellationToken)
         {
